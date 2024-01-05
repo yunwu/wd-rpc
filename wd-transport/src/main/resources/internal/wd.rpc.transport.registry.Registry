@@ -1,0 +1,2 @@
+zookeeper=wd.rpc.transport.registry.ZkRegistry
+redis=wd.rpc.transport.registry.RedisRegistry
