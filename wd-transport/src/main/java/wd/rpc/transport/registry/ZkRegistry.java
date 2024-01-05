@@ -1,8 +1,14 @@
 package wd.rpc.transport.registry;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.zookeeper.*;
+import org.apache.zookeeper.common.StringUtils;
 import org.apache.zookeeper.data.Stat;
+import wd.rpc.transport.Common.GlobalContents;
+import wd.rpc.transport.Common.GlobalContext;
 import wd.rpc.transport.Common.RpcContext;
+import wd.rpc.transport.Common.exceptions.ErrorCode;
+import wd.rpc.transport.Common.exceptions.RpcException;
 import wd.rpc.transport.invoker.Invoker;
 
 import java.io.IOException;
@@ -13,13 +19,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-
+@Slf4j
 public class ZkRegistry implements Registry{
 
-    private static final String SEPARATOR = ",";
+    private static final String ZOOKEEPER_URL_KEY = "zookeeper.url";
+    private static final String RPC_PORT_KEY = "rpc.port";
 
     private static ZooKeeper zooKeeper;
-    //TODO port 设置
     private int port = 2884;
 
     private static Watcher watcher;
@@ -31,9 +37,14 @@ public class ZkRegistry implements Registry{
             }
         };
         try {
-            zooKeeper = new ZooKeeper("localhost:2181", 3000, watcher);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            String value = GlobalContext.getByKeyOrDefault(ZOOKEEPER_URL_KEY,"");
+            if (StringUtils.isEmpty(value)){
+                throw new RpcException(ErrorCode.CONFIG_ITEM_ERROR, "zookeeper 链接地址配置异常");
+            }
+            zooKeeper = new ZooKeeper(value, 3000, watcher);
+        } catch (Exception e) {
+            log.error("链接zookeeper异常，", e);
+            throw new RpcException(ErrorCode.CONFIG_ITEM_ERROR, "链接zookeeper异常",e);
         }
     }
 
@@ -44,6 +55,7 @@ public class ZkRegistry implements Registry{
         //管理service
 
         try {
+            port = Integer.parseInt(GlobalContext.getByKeyOrDefault(RPC_PORT_KEY, port+""));
             String address = InetAddress.getLocalHost().getHostAddress() + ":" + port;
             String path = "/" + invoker.getServiceName();
             Stat stat =  zooKeeper.exists(path, false);
@@ -56,20 +68,15 @@ public class ZkRegistry implements Registry{
                 zooKeeper.delete(path, stat.getVersion());
                 zooKeeper.create(path, addressStr.getBytes(), ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
             }
-        } catch (KeeperException e) {
-            throw new RuntimeException(e);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        } catch (UnknownHostException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            log.error("service regist error, ",e);
+            throw new RpcException(ErrorCode.ZOOKEEPER_ERROR, "service regist error",e);
         }
 
     }
 
     private String filterDump(String addressesStr, String address){
-        String[] addressArr = addressesStr.split(SEPARATOR);
+        String[] addressArr = addressesStr.split(GlobalContents.COMMA_SEPARATOR);
         if (addressArr == null || addressArr.length == 0){
             return address;
         }

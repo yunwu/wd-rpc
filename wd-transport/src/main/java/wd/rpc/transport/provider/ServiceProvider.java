@@ -18,7 +18,7 @@ public class ServiceProvider implements Provider{
     public void regist(Invoker invoker, RpcContext context) {
         Registry registry = null;
         try {
-            registry = RegistryFactory.getRegistry(RegistryFactory.registryName);
+            registry = RegistryFactory.getRegistry();
         } catch (Exception e) {
             log.error("获取registry error");
             return;

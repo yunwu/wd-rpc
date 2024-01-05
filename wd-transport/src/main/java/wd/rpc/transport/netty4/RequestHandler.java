@@ -2,13 +2,18 @@ package wd.rpc.transport.netty4;
 
 import com.alibaba.fastjson.JSON;
 import io.netty.channel.Channel;
+import lombok.extern.slf4j.Slf4j;
+import wd.rpc.transport.Common.GlobalContents;
 import wd.rpc.transport.Common.RequestDTO;
+import wd.rpc.transport.Common.exceptions.ErrorCode;
+import wd.rpc.transport.Common.exceptions.RpcException;
 import wd.rpc.transport.provider.ServiceProvider;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 
+@Slf4j
 public class RequestHandler {
 
 
@@ -25,15 +30,9 @@ public class RequestHandler {
             Method method = targetClass.getMethod(request.getTargetMethod(),request.getParamTypes());
             Object result = method.invoke(target, request.getParams().values().toArray());
             channel.writeAndFlush(result);
-        } catch (InstantiationException e) {
-            //TODO 异常也需要写入到返回结果中
-            throw new RuntimeException(e);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        } catch (InvocationTargetException e) {
-            throw new RuntimeException(e);
-        } catch (NoSuchMethodException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            log.error("request run error,{},", msg, e);
+            throw new RpcException(ErrorCode.SERVICE_RUN_ERROR, "request run error", e);
         }
     }
 }

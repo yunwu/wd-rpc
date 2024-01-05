@@ -1,18 +1,21 @@
 package wd.rpc.transport.registry;
 
 import wd.rpc.transport.Common.ExtensionLoader;
-
-import java.util.HashMap;
-import java.util.Map;
+import wd.rpc.transport.Common.GlobalContext;
 
 public class RegistryFactory {
 
-    public static final String registryName = "zookeeper";
+    public static final String REGISTRY_NAME = "zookeeper";
+    public static final String RPC_PROPERTY_KEY = "rpc.registry";
 
-    //获取ExtensionLoader并处理，最好不要在写一个单独的registry
-
-    public static Registry getRegistry(String registryName) throws Exception {
+    public static Registry getRegistry() throws Exception {
+        String key = GlobalContext.getByKeyOrDefault(RPC_PROPERTY_KEY, REGISTRY_NAME);
+        return getRegistry(key);
+    }
+    private static Registry getRegistry(String registryName) throws Exception {
         ExtensionLoader<Registry> extensionLoader = new ExtensionLoader();
         return extensionLoader.getExtensionClazz(Registry.class.getName(), registryName);
     }
+
+
 }
