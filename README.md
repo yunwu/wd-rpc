@@ -12,7 +12,7 @@
 
 封装SPI机制
 
-封装skelton服务流程
+封装stub/skelton服务流程(代理模式)
 
 异常包装
 

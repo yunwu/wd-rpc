@@ -2,7 +2,6 @@ package wd.rpc.transport.registry;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.zookeeper.*;
-import org.apache.zookeeper.common.StringUtils;
 import org.apache.zookeeper.data.Stat;
 import wd.rpc.transport.Common.GlobalContents;
 import wd.rpc.transport.Common.GlobalContext;
@@ -11,9 +10,7 @@ import wd.rpc.transport.Common.exceptions.ErrorCode;
 import wd.rpc.transport.Common.exceptions.RpcException;
 import wd.rpc.transport.invoker.Invoker;
 
-import java.io.IOException;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -38,7 +35,7 @@ public class ZkRegistry implements Registry{
         };
         try {
             String value = GlobalContext.getByKeyOrDefault(ZOOKEEPER_URL_KEY,"");
-            if (StringUtils.isEmpty(value)){
+            if (value == null || "".equals(value.trim())){
                 throw new RpcException(ErrorCode.CONFIG_ITEM_ERROR, "zookeeper 链接地址配置异常");
             }
             zooKeeper = new ZooKeeper(value, 3000, watcher);
@@ -72,7 +69,6 @@ public class ZkRegistry implements Registry{
             log.error("service regist error, ",e);
             throw new RpcException(ErrorCode.ZOOKEEPER_ERROR, "service regist error",e);
         }
-
     }
 
     private String filterDump(String addressesStr, String address){

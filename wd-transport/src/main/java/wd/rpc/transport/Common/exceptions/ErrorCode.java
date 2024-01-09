@@ -23,4 +23,6 @@ public class ErrorCode {
 
     public static final int SERVICE_RUN_ERROR = 6;
 
+    public static final int SERVICE_CONSTRUCT_ERROR = 7;
+
 }

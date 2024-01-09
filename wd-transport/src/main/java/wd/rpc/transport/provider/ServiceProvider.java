@@ -5,7 +5,6 @@ import wd.rpc.transport.Common.RpcContext;
 import wd.rpc.transport.invoker.Invoker;
 import wd.rpc.transport.registry.Registry;
 import wd.rpc.transport.registry.RegistryFactory;
-import wd.rpc.transport.registry.ZkRegistry;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -26,7 +25,7 @@ public class ServiceProvider implements Provider{
         try{
             registry.regist(invoker, context);
         }catch (Exception e){
-            e.printStackTrace();
+            log.error("service regist error,{}", invoker.getServiceName(), e);
         }
         cache.put(invoker.getServiceName(), invoker.getTargetService());
     }

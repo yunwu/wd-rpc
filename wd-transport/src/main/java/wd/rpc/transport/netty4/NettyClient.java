@@ -1,6 +1,6 @@
 package wd.rpc.transport.netty4;
 
-import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson2.JSON;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -44,9 +44,9 @@ public class NettyClient {
         port = Integer.parseInt(urlArr[1]);
 
     }
-    public ChannelFuture sendMsg(Object msg){
+    public void sendMsg(Object msg){
         log.info("send msg,{}", msg);
-        return channel.writeAndFlush(JSON.toJSONString(msg));
+        channel.writeAndFlush(JSON.toJSONString(msg));
     }
 
     public void connect(){

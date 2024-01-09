@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
-import java.util.Map;
 
 @Data
 @Getter
@@ -15,13 +14,15 @@ public class RequestDTO implements Serializable {
 
     private static final Long serialVersionUID = -1L;
 
+    private String requestId;
+
     private String url;
 
     private Class<?> targetService;
 
+    private Class<?>[] paramsTypes;
+
     private String targetMethod;
 
-    private Class<?>[] paramTypes;
-
-    private Map<String, Object> params;
+    private Object[] params;
 }

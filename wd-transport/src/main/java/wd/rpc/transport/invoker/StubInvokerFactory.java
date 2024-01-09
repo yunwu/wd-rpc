@@ -1,6 +1,6 @@
 package wd.rpc.transport.invoker;
 
-public class ServiceInvokerFactory<T> {
+public class StubInvokerFactory<T> {
 
     /**
      * 将服务包装成invoker
@@ -8,7 +8,7 @@ public class ServiceInvokerFactory<T> {
      * @return
      */
     public Invoker createInvoker(Class<T> targetService){
-        ServiceInvoker invoker = new ServiceInvoker(targetService);
+        StubInvoker invoker = new StubInvoker(targetService);
         return invoker;
     }
 }
